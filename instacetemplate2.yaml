@@ -14,15 +14,13 @@ resources:
        - key: startup-script
          value: |
                 #!/bin/bash
-                apt-get update -y
-                apt-get install apache2 -y
-                cat <<EOF > /var/www/html/index.html
-                <html>
-                <body>
-                <title>Apache Server</title>
-                </body>
-                </html>
-                EOF
+                sudo apt update -y
+                sudo apt install apache2 -y
+                sudo apt install git -y
+                rm -rf /var/www/html/*
+                cd /var/www/html
+                git clone https://github.com/vithalnaik/myblog.git . 
+                sed -i "s/hostname/`hostname`/g" index.html
      disks:
      - type: PERSISTENT
        boot: true
