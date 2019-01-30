@@ -1,0 +1,34 @@
+resources:
+  - name: bes
+    type: compute.v1.backendService
+    properties:
+      port: 80
+      portName: http
+      protocol: HTTP
+      backends:
+      - name: bes
+        balancingMode: UTILIZATION
+        capacityScaler: 1.0
+        group: zones/northamerica-northeast1-a/instanceGroups/instance-group
+      maxUtilization: 0.8
+      connectionDraining:
+        drainingTimeoutSec: 300
+      healthChecks:
+      - global/httpHealthChecks/lb-hc
+  - name: url-map
+    type: compute.v1.urlMap
+    properties:
+      defaultService: $(ref.bes.selfLink)
+  - name: http-proxy
+    type: compute.v1.targetHttpProxy
+    properties:
+      urlMap: $(ref.url-map.selfLink)
+  - name: ipaddress
+    type: compute.v1.globalAddress
+  - name: apache-http-forwardingrule
+    type: compute.v1.globalForwardingRule
+    properties:
+      target: $(ref.http-proxy.selfLink)
+      IPAddress: $(ref.ipaddress.address)
+      IPProtocol: TCP
+      portRange: 80-80

@@ -1,0 +1,80 @@
+resources:
+ - name: instance-template-1
+   type: compute.v1.instanceTemplate
+   properties:
+    properties:
+     machineType: f1-micro
+     tags:
+       items:
+       - http-server
+       - http-tag
+     metadata:
+       kind: compute#metadata
+       items:
+       - key: startup-script
+         value: |
+                #!/bin/bash
+                apt-get update -y
+                apt-get install apache2 -y
+                cat <<EOF > /var/www/html/index.html
+                <html>
+                <body>
+                <title>Apache Server</title>
+                </body>
+                </html>
+                EOF
+     disks:
+     - type: PERSISTENT
+       boot: true
+       mode: READ_WRITE
+       autoDelete: true
+       deviceName: instance-template-1
+       initializeParams:
+         sourceImage: projects/ubuntu-os-cloud/global/images/ubuntu-1804-bionic-v20181222
+         diskType: pd-standard
+         diskSizeGb: '10'
+     networkInterfaces:
+     - network: projects/precise-sight-228704/global/networks/default
+       accessConfigs:
+       - name: External NAT
+         type: ONE_TO_ONE_NAT
+         networkTier: PREMIUM
+     scheduling:
+       preemptible: false
+       onHostMaintenance: MIGRATE
+       automaticRestart: true
+     serviceAccounts:
+     - email: 416709458889-compute@developer.gserviceaccount.com
+       scopes:
+       - https://www.googleapis.com/auth/devstorage.read_only
+       - https://www.googleapis.com/auth/logging.write
+       - https://www.googleapis.com/auth/monitoring.write
+       - https://www.googleapis.com/auth/servicecontrol
+       - https://www.googleapis.com/auth/service.management.readonly
+       - https://www.googleapis.com/auth/trace.append
+ - name: instance-group
+   type: compute.v1.instanceGroupManagers
+   properties:
+     baseInstanceName: instance
+     instanceTemplate: $(ref.instance-template-1.selfLink)
+     targetSize: 2
+     zone: northamerica-northeast1-a
+ - name: apache-as
+   type: compute.v1.autoscaler
+   properties:
+     zone: northamerica-northeast1-a
+     target: $(ref.instance-group.selfLink)
+     autoscalingPolicy:
+       minNumReplicas: 1
+       maxNumReplicas: 10
+       coolDownPeriodSec: 60
+       cpuUtilization:
+        utilizationTarget: 0.8
+ - name: a-firewall-rule
+   type: compute.v1.firewall
+   properties:
+     sourceRanges: ["0.0.0.0/0"]
+     targetTags: ["myrules"]
+     allowed:
+     - IPProtocol: TCP
+       ports: ["80"]

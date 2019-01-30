@@ -1,0 +1,9 @@
+resources:
+- name: all-internal-firewall-rule
+  type: compute.v1.firewall
+  properties:
+    sourceRanges: ["0.0.0.0/0"]
+    targetTags: ["https-server"]
+    allowed:
+    - IPProtocol: TCP
+      ports: ["80"]
