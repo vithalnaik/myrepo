@@ -3,7 +3,7 @@ resources:
    type: compute.v1.instanceTemplate
    properties:
     properties:
-     machineType: f1-micro
+     machineType: g1-small
      tags:
        items:
        - http-server
