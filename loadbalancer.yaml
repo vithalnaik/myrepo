@@ -25,7 +25,7 @@ resources:
       urlMap: $(ref.url-map.selfLink)
   - name: ipaddress
     type: compute.v1.globalAddress
-  - name: apache-http-forwardingrule
+  - name: http-forwardingrule
     type: compute.v1.globalForwardingRule
     properties:
       target: $(ref.http-proxy.selfLink)
