@@ -63,9 +63,9 @@ resources:
      zone: northamerica-northeast1-a
      target: $(ref.instance-group.selfLink)
      autoscalingPolicy:
-       minNumReplicas: 1
-       maxNumReplicas: 10
-       coolDownPeriodSec: 60
+       minNumReplicas: 2
+       maxNumReplicas: 5
+       coolDownPeriodSec: 30
        cpuUtilization:
         utilizationTarget: 0.8
  - name: a-firewall-rule
